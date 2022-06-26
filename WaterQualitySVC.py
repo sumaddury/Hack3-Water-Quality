@@ -56,7 +56,19 @@ model = SVC(kernel ='rbf',)
 model.fit(fTrain, tTrain)
 
 # Enter the values of the 9 attributes and the model will predict ie. ([[ph, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic_carbon, Trihalomethanes, Turbidity]])
-model.predict([[]]) 
+#model.predict([[]]) 
+
+ph = int(input("Enter ph: "))
+Hardness = int(input("Enter Hardness: "))
+Solids = int(input("Enter Solids: "))
+Chloramines = int(input("Enter Chloramines: "))
+Sulfate = int(input("Enter Sulfate: "))
+Conductivity = int(input("Enter Conductivity: "))
+Organic_carbon = int(input("Enter Organic_carbon: "))
+Trihalomethanes = int(input("Enter Trihalomethanes: "))
+Turbidity = int(input("Enter Turbidity: "))
+
+print(model.predict([[ph, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic_carbon, Trihalomethanes, Turbidity]])
 
 
 
