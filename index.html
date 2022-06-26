@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+  
+    <link rel="stylesheet">
+  
+    <link rel="stylesheet" href="style.css">
+</head>
+  
+<body>
+
+
+
+
+<nav>
+        <div class="nav-bar">
+            <i class='bx bx-menu sidebarOpen' ></i>
+            <span class="logo navLogo"><a href="#">Hack3: Global Water Potability</a></span>
+
+            <div class="menu">
+                <div class="logo-toggle">
+                    <span class="logo"><a href="#"></a></span>
+                    <i class='bx bx-x siderbarClose'></i>
+                </div>
+
+                <ul class="nav-links">
+                    <li><a href="./index.html">Map</a></li>
+                   <li><a href="./add_data.html">Add Data</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+
+
+
+
+
+
+
+  
+<div id="map" style="width: 1000px; height: 600px;"></div>
+
+<div id="popup" class="ol-popup" style="background-color:white; padding:3px; border-radius:4px; border: 0.5px solid blue;">
+  <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+  <div id="popup-content"></div>
+ </div>
+
+<h3>Click on a point in the map to see the location and the quality of water there!</h3>
+
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+
+
+  
+<script>
+
+  //INITIALIZING THE MAP
+   var attribution = new ol.control.Attribution({
+       collapsible: false
+   });
+   var map = new ol.Map({
+       controls: ol.control.defaults({attribution: false}).extend([attribution]),
+       layers: [
+           new ol.layer.Tile({
+               source: new ol.source.OSM({
+                   url: 'https://tile.openstreetmap.be/osmbe/{z}/{x}/{y}.png',
+                   attributions: [ ol.source.OSM.ATTRIBUTION, 'Tiles courtesy of <a href="https://geo6.be/">GEO-6</a>' ],
+                   maxZoom: 28
+               })
+           })
+       ],
+       target: 'map',
+       view: new ol.View({
+           center: ol.proj.fromLonLat([180, 50]),
+           maxZoom: 28,
+           zoom: 2.5
+       })
+   });
+
+
+
+  fetch("./data.json")
+    .then(function(resp) {
+      return resp.json();
+    })
+    .then(function(data) {
+      for (let i = 0; i < data.length; i++) {
+          console.log("affirmative");
+          var name = data[i].name;
+          var longitude = data[i].longitude;
+          var latitude = data[i].latitude;
+          var potability = data[i].potability;
+          //ADDING THE MARKER
+           var layer = new ol.layer.Vector({
+               source: new ol.source.Vector({
+                   features: [
+                       new ol.Feature({
+                           geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude, latitude]))
+                       })
+                   ]
+               })
+           });
+           map.addLayer(layer);
+        
+        
+          //INITIALIZING THE POPUP
+           var container = document.getElementById('popup');
+           var content = document.getElementById('popup-content');
+           var closer = document.getElementById('popup-closer');
+          
+           var overlay = new ol.Overlay({
+               element: container,
+               autoPan: true,
+               autoPanAnimation: {
+                   duration: 250
+               }
+           });
+           map.addOverlay(overlay);
+          
+           closer.onclick = function() {
+               overlay.setPosition(undefined);
+               closer.blur();
+               return false;
+           };
+        
+          //LOADING POPUP
+         map.on('singleclick', function (event) {
+             if (map.hasFeatureAtPixel(event.pixel) === true) {
+                 var coordinate = event.coordinate;
+        
+                 content.innerHTML = '<b>'+name+'<br>Potability: '+potability;
+                 overlay.setPosition(coordinate);
+             } else {
+                 overlay.setPosition(undefined);
+                 closer.blur();
+             }
+         });
+      }
+      
+    });
+
+ 
+
+  
+
+  
+</script>
+  
+</body>
+  
+</html>
